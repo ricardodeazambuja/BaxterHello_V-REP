@@ -15,7 +15,7 @@ plt.show()
 
 
 
-hello = numpy.array(hello[300:,[0,1]])
+hello = numpy.array(hello[300:523+300,[0,1]])
 
 hello[:,0] = -(hello[:,0]-hello[0,0])/2.0
 hello[:,1] = -(hello[:,1]-hello[0,1])/2.0
@@ -39,7 +39,7 @@ if clientID!=-1:
         for hi in hello:
             time.sleep(0.05)
             cmd_pos = numpy.array(pos)+numpy.concatenate([hi,[0]]) # Sums X and Y
-            print "Cmd Position: ", i, hi, pos
+            print "Cmd Position: ", i, hi, cmd_pos
             i+=1
             # Sets the new position
             res = vrep.simxSetObjectPosition(clientID,v0,vrep.sim_handle_parent,cmd_pos,vrep.simx_opmode_oneshot_wait)
@@ -47,7 +47,16 @@ if clientID!=-1:
                 vrep.simxFinish(clientID)
                 print 'Remote API function call returned with error code: ',res
                 break
-
+        cmd_pos = numpy.array(pos)+numpy.concatenate([hello[-1],[0.05]]) # lift the pen
+        res = vrep.simxSetObjectPosition(clientID,v0,vrep.sim_handle_parent,cmd_pos,vrep.simx_opmode_oneshot_wait)
+        time.sleep(0.05)
+        final_pos = numpy.concatenate([[-0.6019,0.2206],[cmd_pos[2]]])
+        dif_pos = final_pos - cmd_pos
+        dif_pos = dif_pos/10.0
+        for i in range(10):
+            cmd_pos = cmd_pos+dif_pos#numpy.concatenate([[-0.6019,0.2206],[cmd_pos[2]]]) # lift the pen
+            res = vrep.simxSetObjectPosition(clientID,v0,vrep.sim_handle_parent,cmd_pos,vrep.simx_opmode_oneshot_wait)
+            time.sleep(0.05)
 
     else:
         print 'Remote API function call returned with error code: ',res
